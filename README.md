@@ -2,7 +2,7 @@
 
 # linkedin-mcp
 
-A [Model Context Protocol](https://modelcontextprotocol.io) server in Rust that lets AI assistants read your LinkedIn profile and publish posts. It is built on the official Rust SDK [`rmcp`](https://crates.io/crates/rmcp) and served over **Streamable HTTP**.
+A [Model Context Protocol](https://modelcontextprotocol.io) server in Rust that lets AI assistants read your LinkedIn profile, publish posts, and comment on and like posts. It is built on the official Rust SDK [`rmcp`](https://crates.io/crates/rmcp) and served over **Streamable HTTP**.
 
 ## Tools
 
@@ -11,8 +11,16 @@ A [Model Context Protocol](https://modelcontextprotocol.io) server in Rust that 
 | `get_profile` | Returns name, email, picture, and person URN (read-only) | `GET /v2/userinfo` |
 | `create_text_post` | Publishes a text post (`PUBLIC` or `CONNECTIONS`) | `POST /v2/ugcPosts` |
 | `share_article` | Shares a link with commentary, plus an optional title and description | `POST /v2/ugcPosts` (`ARTICLE`) |
+| `create_media_post` | Publishes a post with an image (up to 20 MB) or video (up to 200 MB), given as `media_url` or `media_base64` | `POST /v2/assets?action=registerUpload`, upload, then `POST /v2/ugcPosts` (`IMAGE`/`VIDEO`) |
+| `comment_on_post` | Comments on a post (up to 1,250 characters) | `POST /v2/socialActions/{post}/comments` |
+| `like_post` | Likes a post | `POST /v2/socialActions/{post}/likes` |
+| `delete_post` | Permanently deletes one of your own posts | `DELETE /v2/ugcPosts/{post}` |
 
-The two post tools publish **immediately**. They are annotated as non-read-only, so MCP clients ask you to approve each call.
+Every tool except `get_profile` acts **immediately**. They are annotated as non-read-only (and `delete_post` as destructive), so MCP clients ask you to approve each call.
+
+Tools that take a `post` accept a post URN (`urn:li:share:…`, `urn:li:ugcPost:…` or `urn:li:activity:…`) or a linkedin.com post URL. `delete_post` needs the `share` or `ugcPost` URN, which the post tools return.
+
+`media_url` must be a public `https` URL. The server won't follow redirects or fetch private or loopback addresses.
 
 ## 1. Get a LinkedIn access token
 
@@ -88,5 +96,4 @@ cargo clippy --all-targets -- -D warnings
 ## Roadmap
 
 - A built-in OAuth 2.0 authorization-code flow with refresh, instead of a pasted token
-- Image posts (`assets?action=registerUpload`)
 - Migrating to the versioned `/rest/posts` API once it is available to self-serve apps

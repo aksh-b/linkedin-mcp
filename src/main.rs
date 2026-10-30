@@ -34,7 +34,10 @@ async fn main() -> anyhow::Result<()> {
 
     let app = app(&config, client, ct.clone());
     let listener = tokio::net::TcpListener::bind(config.bind_addr).await?;
-    tracing::info!("LinkedIn MCP server listening on http://{}/mcp", config.bind_addr);
+    tracing::info!(
+        "LinkedIn MCP server listening on http://{}/mcp",
+        config.bind_addr
+    );
 
     axum::serve(listener, app)
         .with_graceful_shutdown(async move {
