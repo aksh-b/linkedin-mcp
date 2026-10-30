@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/logo-wordmark.svg" alt="linkedin-mcp" width="420"></p>
+
 # linkedin-mcp
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server in Rust that lets AI assistants read your LinkedIn profile and publish posts. It is built on the official Rust SDK [`rmcp`](https://crates.io/crates/rmcp) and served over **Streamable HTTP**.
